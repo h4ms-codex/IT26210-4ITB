@@ -87,7 +87,6 @@ def save_data_to_file():
         messagebox.showwarning("No Data", "No info selected to save.")
         return
 
-    # Open save dialog
     file_path = filedialog.asksaveasfilename(
         defaultextension=".txt",
         filetypes=[("Text files", "*.txt"), ("All files", "*.*")],
@@ -95,7 +94,7 @@ def save_data_to_file():
     )
 
     if not file_path:
-        return  # User cancelled
+        return
 
     try:
         with open(file_path, "w") as f:
@@ -110,7 +109,6 @@ root.title("IP Info Viewer")
 root.geometry("500x500")
 root.resizable(False, False)
 
-# ----- Checkboxes -----
 var_ip = tk.BooleanVar(value=True)
 var_location = tk.BooleanVar()
 var_coords = tk.BooleanVar()
@@ -128,16 +126,14 @@ tk.Checkbutton(checkbox_frame, text="Coordinates", variable=var_coords).grid(row
 tk.Checkbutton(checkbox_frame, text="Timezone", variable=var_timezone).grid(row=3, column=0, sticky="w")
 tk.Checkbutton(checkbox_frame, text="ISP / ASN", variable=var_isp).grid(row=4, column=0, sticky="w")
 
-# ----- Buttons -----
 btn_frame = tk.Frame(root)
 btn_frame.pack(pady=10)
 
 tk.Button(btn_frame, text="Fetch Info", command=display_selected_info, width=20).grid(row=0, column=0, padx=5)
 tk.Button(btn_frame, text="Save to File", command=save_data_to_file, width=20).grid(row=0, column=1, padx=5)
 
-# ----- Output Area -----
 output_text = scrolledtext.ScrolledText(root, width=60, height=15, wrap=tk.WORD)
 output_text.pack(pady=10)
 
-# ----- Run App -----
 root.mainloop()
+
