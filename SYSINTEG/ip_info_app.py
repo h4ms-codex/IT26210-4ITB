@@ -5,10 +5,38 @@ import requests
 
 def fetch_ip_data():
     try:
-        response = requests.get("https://ipapi.co/json/", timeout=10)
+        response = requests.get("https://ipwho.is/", timeout=5)
         response.raise_for_status()
-        return response.json()
-    except requests.exceptions.RequestException as e:
+        data = response.json()
+
+        if not data.get("success", True):
+            raise ValueError(data.get("message", "API returned an error."))
+
+        ip = data.get("ip", "Unknown")
+        city = data.get("city", "Unknown")
+        region = data.get("region", "Unknown")
+        country = data.get("country", "Unknown")
+        latitude = data.get("latitude", "Unknown")
+        longitude = data.get("longitude", "Unknown")
+        timezone = data.get("timezone", "Unknown")
+        isp = data.get("connection", {}).get("isp", "Unknown")
+        asn = data.get("connection", {}).get("asn", "Unknown")
+
+        return {
+            "ip": ip,
+            "city": city,
+            "region": region,
+            "country": country,
+            "latitude": latitude,
+            "longitude": longitude,
+            "timezone": timezone,
+            "isp": isp,
+            "asn": asn,
+            "location": f"{city}, {region}, {country}",
+            "coordinates": f"{latitude}, {longitude}",
+        }
+
+    except (requests.exceptions.RequestException, ValueError) as e:
         messagebox.showerror("Error", f"Failed to fetch IP info:\n{e}")
         return None
 
@@ -27,9 +55,8 @@ def display_selected_info():
     if var_location.get():
         city = data.get("city")
         region = data.get("region")
-        country = data.get("country_name")
-        country_code = data.get("country")
-        output.append(f"Location: {city}, {region}, {country} ({country_code})")
+        country = data.get("country")
+        output.append(f"Location: {city}, {region}, {country}")
 
     if var_coords.get():
         latitude = data.get("latitude")
@@ -41,7 +68,7 @@ def display_selected_info():
         output.append(f"Timezone: {timezone}")
 
     if var_isp.get():
-        isp = data.get("org")
+        isp = data.get("isp")
         asn = data.get("asn")
         output.append(f"ISP / Provider: {isp}")
         output.append(f"ASN: {asn}")
@@ -64,9 +91,8 @@ def save_data_to_file():
     if var_location.get():
         city = data.get("city")
         region = data.get("region")
-        country = data.get("country_name")
-        country_code = data.get("country")
-        output.append(f"Location: {city}, {region}, {country} ({country_code})")
+        country = data.get("country")
+        output.append(f"Location: {city}, {region}, {country}")
 
     if var_coords.get():
         latitude = data.get("latitude")
@@ -78,7 +104,7 @@ def save_data_to_file():
         output.append(f"Timezone: {timezone}")
 
     if var_isp.get():
-        isp = data.get("org")
+        isp = data.get("isp")
         asn = data.get("asn")
         output.append(f"ISP / Provider: {isp}")
         output.append(f"ASN: {asn}")
@@ -109,6 +135,7 @@ root.title("IP Info Viewer")
 root.geometry("500x500")
 root.resizable(False, False)
 
+# ----- Checkboxes -----
 var_ip = tk.BooleanVar(value=True)
 var_location = tk.BooleanVar()
 var_coords = tk.BooleanVar()
@@ -126,14 +153,18 @@ tk.Checkbutton(checkbox_frame, text="Coordinates", variable=var_coords).grid(row
 tk.Checkbutton(checkbox_frame, text="Timezone", variable=var_timezone).grid(row=3, column=0, sticky="w")
 tk.Checkbutton(checkbox_frame, text="ISP / ASN", variable=var_isp).grid(row=4, column=0, sticky="w")
 
+# ----- Buttons -----
 btn_frame = tk.Frame(root)
 btn_frame.pack(pady=10)
 
 tk.Button(btn_frame, text="Fetch Info", command=display_selected_info, width=20).grid(row=0, column=0, padx=5)
 tk.Button(btn_frame, text="Save to File", command=save_data_to_file, width=20).grid(row=0, column=1, padx=5)
 
+# ----- Output Area -----
 output_text = scrolledtext.ScrolledText(root, width=60, height=15, wrap=tk.WORD)
 output_text.pack(pady=10)
 
+# ----- Run App -----
 root.mainloop()
+
 
