@@ -1,0 +1,120 @@
+body {
+    font-family: "Segoe UI", sans-serif;
+    background: #f0f4f8;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.header {
+    text-align: center;
+    margin-top: 20px;
+    color: #0078d7;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.card {
+    background: #ffffff;
+    width: 90%;
+    max-width: 550px;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    margin-top: 20px;
+}
+
+label {
+    display: block;
+    margin: 8px 0;
+    font-size: 15px;
+    color: #222;
+}
+
+.btn {
+    background: #0078d7;
+    color: white;
+    border: none;
+    padding: 10px 16px;
+    margin: 5px;
+    cursor: pointer;
+    border-radius: 4px;
+    font-weight: bold;
+    transition: 0.2s;
+}
+
+.btn:hover {
+    background: #005a9e;
+}
+
+.output-title {
+    color: #0078d7;
+    margin-top: 20px;
+    font-weight: bold;
+}
+
+textarea {
+    width: 100%;
+    height: 200px;
+    margin-top: 10px;
+    font-family: Consolas, monospace;
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    resize: none;
+}
+
+/* Output section title */
+.output-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #0d6efd;
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+
+/* Output textarea styling */
+#output {
+    width: 100%;
+    height: 200px;
+    padding: 15px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    font-family: "Consolas", "Courier New", monospace;
+    background: #fafafa;
+    box-sizing: border-box;
+    outline: none;
+
+    /* ✨ Disable resizing & enable scrolling */
+    resize: none;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+
+/* Card container (optional improvement) */
+.card {
+    background: #fff;
+    border: 1px solid #dcdcdc;
+    border-radius: 12px;
+    padding: 25px;
+     max-width: 800px;   /* ⬅ bigger width */
+    width: 95%;         /* full width on small screens */
+    margin: 20px auto;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.08);
+}
+
+#historyBox {
+    width: 100%;
+    height: 350px;        /* ⬅ make it bigger */
+    padding: 15px;
+    border-radius: 8px;
+    background: #fafafa;
+    border: 1px solid #ccc;
+    resize: none;
+    overflow-y: auto;      /* ⬅ allows scrolling */
+    overflow-x: hidden;
+    font-family: Consolas, monospace;
+}

@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>IP Information Viewer</title>
+    <link rel="stylesheet" href="style.css" />
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #f5f5f5; }
+        .header { text-align: center; }
+        .tabs { margin: 20px 0; text-align: center; }
+        .tab-btn { padding: 10px 20px; margin: 0 5px; cursor: pointer; border: none; border-radius: 5px; background: #ccc; }
+        .tab-btn.active { background: #007bff; color: white; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); max-width: 600px; margin: auto; }
+        .btn { padding: 10px 15px; margin: 5px; cursor: pointer; border: none; border-radius: 5px; background: #007bff; color: white; }
+        .output-title { margin-top: 20px; }
+        textarea { width: 100%; height: 150px; margin-top: 10px; border-radius: 5px; padding: 10px; resize: none; }
+        .map-box { margin-top: 10px; border-radius: 10px; overflow: hidden; }
+    </style>
+</head>
+<body>
+
+    <h1 class="header">IP Information Viewer</h1>
+    <p>Enter an IP address or leave empty to auto-detect your own.</p>
+
+    <!-- Tabs Navigation -->
+    <div class="tabs">
+        <button class="tab-btn active" onclick="showTab('viewer')">Viewer</button>
+        <button class="tab-btn" onclick="showTab('history')">History Log</button>
+    </div>
+
+    <!-- Viewer Tab -->
+    <div id="viewer" class="tab-content active">
+        <div class="card">
+            <input type="text" id="ipInput" placeholder="Enter IP address (optional)">
+            <button class="btn" onclick="fetchInfo()">Fetch Info</button>
+            <button class="btn" onclick="fetchMyIP()">Fetch My IP</button>
+            <button class="btn" onclick="saveToFile()">Save to File</button>
+
+            <h3 class="output-title">Results</h3>
+            <textarea id="output" disabled></textarea>
+
+            <h3 class="output-title">Location</h3>
+            <div id="map" class="map-box"></div>
+        </div>
+    </div>
+
+    <!-- History Tab -->
+    <div id="history" class="tab-content">
+        <h3>History Log</h3>
+        <textarea id="historyBox" disabled></textarea>
+    </div>
+
+    <script>
+    function showTab(tab) {
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(tab).classList.add('active');
+        event.target.classList.add('active');
+    }
+
+    async function fetchIPData(ip) {
+        try {
+            const url = ip ? `https://ipwho.is/${ip}` : `https://ipwho.is/`;
+            const res = await fetch(url);
+            const data = await res.json();
+            if (!data.success) throw new Error(data.message);
+
+            return {
+                ip: data.ip,
+                city: data.city,
+                region: data.region,
+                country: data.country,
+                latitude: data.latitude,
+                longitude: data.longitude,
+                timezone: data.timezone?.id || data.timezone,
+                isp: data.connection?.isp,
+                asn: data.connection?.asn,
+            };
+        } catch (err) {
+            alert("Failed to fetch IP info:\n" + err);
+            return null;
+        }
+    }
+
+    async function fetchInfo() {
+        const userIP = document.getElementById("ipInput").value.trim();
+        const data = await fetchIPData(userIP);
+        if (!data) return;
+
+        let output = [];
+        output.push(`Public IP Address: ${data.ip}`);
+        output.push(`Location: ${data.city}, ${data.region}, ${data.country}`);
+        output.push(`Latitude / Longitude: ${data.latitude}, ${data.longitude}`);
+        output.push(`Timezone: ${data.timezone}`);
+        output.push(`ISP / Provider: ${data.isp}`);
+        output.push(`ASN: ${data.asn}`);
+
+        const textOutput = output.join("\n");
+        document.getElementById("output").value = textOutput;
+
+        updateMap(data.latitude, data.longitude);
+        addToHistory(textOutput);
+    }
+
+    function updateMap(lat, lon) {
+        const map = document.getElementById("map");
+        map.innerHTML = `<iframe width="100%" height="300" style="border:0; border-radius:10px;"
+            loading="lazy" allowfullscreen
+            src="https://www.google.com/maps?q=${lat},${lon}&z=12&output=embed"></iframe>`;
+    }
+
+    function addToHistory(text) {
+        const historyBox = document.getElementById("historyBox");
+        const timestamp = new Date().toLocaleString();
+        historyBox.value += `\n[${timestamp}]\n${text}\n-----------------------------\n`;
+    }
+
+    function saveToFile() {
+        const text = document.getElementById("output").value;
+        if (!text.trim()) {
+            alert("No data to save. Fetch info first.");
+            return;
+        }
+
+        const blob = new Blob([text], { type: "text/plain" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "ip_info.txt";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    }
+
+    // New function to fetch user's own IP
+    async function fetchMyIP() {
+        document.getElementById("ipInput").value = ""; // Clear input field
+        await fetchInfo(); // Calls fetchInfo, which detects own IP if input is empty
+    }
+    </script>
+
+</body>
+</html>
